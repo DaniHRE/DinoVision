@@ -10,15 +10,16 @@ local ESP = {}
 local Headoff = Vector3.new(0, 0.5, 0)
 local Legoff = Vector3.new(0, 3, 0)
 
-local ESPEnabled = false -- Inicializa o ESP como desligado
+local ESPEnabled = false
 local ChamsEnabled = false
 
 local Options = {
+    Box = false,
+    NameDistance = false,
     LineTracer = false,
     PlayerEquipment = false,
 }
 
--- Função para calcular a distância entre dois pontos
 local function calculateDistance(point1, point2)
     return (point1 - point2).magnitude
 end
@@ -27,6 +28,7 @@ local function studsToMeters(distanceInStuds)
     local metersPerStud = 0.28
     return distanceInStuds * metersPerStud
 end
+
 local function removeESP(player)
     if ESP[player] then
         if ESP[player].PlayerEquipment then ESP[player].PlayerEquipment:Remove() end
@@ -56,6 +58,7 @@ local function createESP(player)
                 removeESP(player)
             end
         end)
+
         local PlayerEquipment = Drawing.new("Text")
         PlayerEquipment.Color = Color3.fromRGB(255, 255, 255)
         PlayerEquipment.Size = 12
@@ -90,6 +93,7 @@ local function createESP(player)
         local lineTracer = Drawing.new("Line")
         lineTracer.Visible = false
         lineTracer.Color = Color3.new(1, 1, 1)
+
         local highlight = Instance.new("Highlight")
         highlight.Parent = character
         highlight.Enabled = false
@@ -101,6 +105,7 @@ local function createESP(player)
             BoxOutline = BoxOutline,
             Box = Box,
             PlayerInfo = PlayerInfo,
+            lineTracer = lineTracer,
             highlight = highlight,
         }
     end
@@ -112,17 +117,6 @@ local function createESP(player)
 end
 
 local function updateESP()
-    if not ESPEnabled then
-        for player, elements in pairs(ESP) do
-            elements.PlayerEquipment.Visible = false
-            elements.BoxOutline.Visible = false
-            elements.Box.Visible = false
-            elements.PlayerInfo.Visible = false
-            elements.lineTracer.Visible = false
-        end
-        return
-    end
-
     for player, elements in pairs(ESP) do
         local character = player.Character
         if character and character:IsDescendantOf(workspace) and character:FindFirstChild("HumanoidRootPart") then
@@ -138,42 +132,43 @@ local function updateESP()
             local DistanceInMeters = studsToMeters(calculateDistance(RootPart.Position, CameraPosition))
 
             if isVisible then
-                elements.PlayerEquipment.Visible = Options.PlayerEquipment
-                if  Options.PlayerEquipment then
-                    local CurrentSlotSelected = player.CurrentSelected.Value
-                    local SlotName = string.format("Slot%i", CurrentSlotSelected)
-                    local Slot = player.GunInventory:FindFirstChild(SlotName).Value or "None"
+                if ESPEnabled then
+                    elements.PlayerEquipment.Visible = Options.PlayerEquipment
+                    if Options.PlayerEquipment then
+                        local CurrentSlotSelected = player.CurrentSelected.Value
+                        local SlotName = string.format("Slot%i", CurrentSlotSelected)
+                        local Slot = player.GunInventory:FindFirstChild(SlotName).Value or "None"
 
-                    Slot = tostring(Slot)
+                        Slot = tostring(Slot)
 
-                    elements.PlayerEquipment.Position = Vector2.new(elements.Box.Position.X + elements.Box.Size.X / 2, elements.Box.Position.Y + elements.Box.Size.Y - 15)
-                    elements.PlayerEquipment.Text = Slot
-                end
+                        elements.PlayerEquipment.Position = Vector2.new(elements.Box.Position.X + elements.Box.Size.X / 2, elements.Box.Position.Y + elements.Box.Size.Y - 15)
+                        elements.PlayerEquipment.Text = Slot
+                    end
 
-                elements.BoxOutline.Size = Vector2.new(1000 / RootPosition.Z * 2, HeadPosition.Y - LegPosition.Y)
-                elements.BoxOutline.Position = Vector2.new(RootPosition.X - elements.BoxOutline.Size.X / 2, RootPosition.Y - elements.BoxOutline.Size.Y / 2)
-                elements.BoxOutline.Visible = true
+                    elements.BoxOutline.Visible = Options.Box
+                    elements.Box.Visible = Options.Box
 
-                elements.Box.Size = Vector2.new(1000 / RootPosition.Z * 2, HeadPosition.Y - LegPosition.Y)
-                elements.Box.Position = Vector2.new(RootPosition.X - elements.Box.Size.X / 2, RootPosition.Y - elements.Box.Size.Y / 2)
-                elements.Box.Visible = true
+                    elements.BoxOutline.Size = Vector2.new(1000 / RootPosition.Z * 2, HeadPosition.Y - LegPosition.Y)
+                    elements.BoxOutline.Position = Vector2.new(RootPosition.X - elements.BoxOutline.Size.X / 2, RootPosition.Y - elements.BoxOutline.Size.Y / 2)
 
-                local NameAndDistanceText = string.format("%s (%.1fm)", player.Name, DistanceInMeters)
-                elements.PlayerInfo.Visible = true
-                elements.PlayerInfo.Position = Vector2.new(LegPosition.X, LegPosition.Y)
-                elements.PlayerInfo.Text = NameAndDistanceText
+                    elements.Box.Size = Vector2.new(1000 / RootPosition.Z * 2, HeadPosition.Y - LegPosition.Y)
+                    elements.Box.Position = Vector2.new(RootPosition.X - elements.Box.Size.X / 2, RootPosition.Y - elements.Box.Size.Y / 2)
 
-                elements.lineTracer.Visible = Options.LineTracer
-                if Options.LineTracer then
-                    elements.lineTracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                    elements.lineTracer.To = Vector2.new(screenPosition.X, screenPosition.Y)
-                end
-            else
-                elements.PlayerEquipment.Visible = false
-                elements.BoxOutline.Visible = false
-                elements.Box.Visible = false
-                elements.PlayerInfo.Visible = false
-                elements.lineTracer.Visible = false
+                    elements.PlayerInfo.Visible = Options.NameDistance
+                    elements.PlayerInfo.Position = Vector2.new(LegPosition.X, LegPosition.Y)
+                    elements.PlayerInfo.Text = string.format("%s (%.1fm)", player.Name, DistanceInMeters)
+
+                    elements.lineTracer.Visible = Options.LineTracer
+                    if Options.LineTracer then
+                        elements.lineTracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                        elements.lineTracer.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                    end
+                else
+                    elements.PlayerEquipment.Visible = false
+                    elements.BoxOutline.Visible = false
+                    elements.Box.Visible = false
+                    elements.PlayerInfo.Visible = false
+                    elements.lineTracer.Visible = false
                 end
 
                 elements.highlight.Enabled = ChamsEnabled
@@ -191,12 +186,10 @@ local function updateESP()
     end
 end
 
--- Cria ESPs para todos os jogadores existentes
 for _, player in pairs(Players:GetPlayers()) do
     createESP(player)
 end
 
--- Connect the PlayerAdded event to create ESP for new players
 Players.PlayerAdded:Connect(createESP)
 Players.PlayerRemoving:Connect(removeESP)
 
@@ -204,7 +197,6 @@ RunService.RenderStepped:Connect(function()
     updateESP()
 end)
 
--- Adiciona uma função para ligar/desligar o ESP
 local function toggleESP()
     ESPEnabled = not ESPEnabled
 end
@@ -212,22 +204,24 @@ end
 local function toggleChams()
     ChamsEnabled = not ChamsEnabled
 end
+
 local function toggleOption(option)
     if Options[option] ~= nil then
         Options[option] = not Options[option]
     end
 end
 
--- INTERFACE
 local UserInputService = game:GetService("UserInputService")
 
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local ESPButton = Instance.new("TextButton")
+local BoxButton = Instance.new("TextButton")
+local NameDistanceButton = Instance.new("TextButton")
 local LineTracerButton = Instance.new("TextButton")
 local PlayerEquipmentButton = Instance.new("TextButton")
+local ChamsButton = Instance.new("TextButton")
 
--- Função para fechar ou abrir a interface com a tecla ShiftDireita
 local function ToggleInterface()
     IsOpen = not IsOpen
     MainFrame.Visible = IsOpen
@@ -239,10 +233,9 @@ UserInputService.InputBegan:Connect(function(input)
     end
 end)
 
--- Criação da GUI
 ScreenGui.Parent = game.CoreGui
 MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 200, 0, 200)
+MainFrame.Size = UDim2.new(0, 200, 0, 370)
 MainFrame.Position = UDim2.new(0, 100, 0, 100)
 MainFrame.BackgroundTransparency = 0.5
 MainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
@@ -252,15 +245,26 @@ ESPButton.Position = UDim2.new(0, 0, 0, 10)
 ESPButton.Text = "Toggle ESP"
 ESPButton.Parent = MainFrame
 
+BoxButton.Size = UDim2.new(0, 200, 0, 50)
+BoxButton.Position = UDim2.new(0, 0, 0, 70)
+BoxButton.Text = "Toggle Box"
+BoxButton.Parent = MainFrame
+
+NameDistanceButton.Size = UDim2.new(0, 200, 0, 50)
+NameDistanceButton.Position = UDim2.new(0, 0, 0, 130)
+NameDistanceButton.Text = "Toggle Name/Distance"
+NameDistanceButton.Parent = MainFrame
+
 LineTracerButton.Size = UDim2.new(0, 200, 0, 50)
-LineTracerButton.Position = UDim2.new(0, 0, 0, 70)
+LineTracerButton.Position = UDim2.new(0, 0, 0, 190)
 LineTracerButton.Text = "Toggle Line Tracer"
 LineTracerButton.Parent = MainFrame
 
 PlayerEquipmentButton.Size = UDim2.new(0, 200, 0, 50)
-PlayerEquipmentButton.Position = UDim2.new(0, 0, 0, 130)
+PlayerEquipmentButton.Position = UDim2.new(0, 0, 0, 250)
 PlayerEquipmentButton.Text = "Toggle Player Equipment"
 PlayerEquipmentButton.Parent = MainFrame
+
 ChamsButton.Size = UDim2.new(0, 200, 0, 50)
 ChamsButton.Position = UDim2.new(0, 0, 0, 310)
 ChamsButton.Text = "Toggle Chams"
@@ -269,6 +273,16 @@ ChamsButton.Parent = MainFrame
 ESPButton.MouseButton1Click:Connect(function()
     toggleESP()
     ESPButton.Text = "ESP: " .. (ESPEnabled and "ON" or "OFF")
+end)
+
+BoxButton.MouseButton1Click:Connect(function()
+    toggleOption("Box")
+    BoxButton.Text = "Box: " .. (Options.Box and "ON" or "OFF")
+end)
+
+NameDistanceButton.MouseButton1Click:Connect(function()
+    toggleOption("NameDistance")
+    NameDistanceButton.Text = "Name/Distance: " .. (Options.NameDistance and "ON" or "OFF")
 end)
 
 LineTracerButton.MouseButton1Click:Connect(function()
@@ -280,6 +294,7 @@ PlayerEquipmentButton.MouseButton1Click:Connect(function()
     toggleOption("PlayerEquipment")
     PlayerEquipmentButton.Text = "Player Equipment: " .. (Options.PlayerEquipment and "ON" or "OFF")
 end)
+
 ChamsButton.MouseButton1Click:Connect(function()
     toggleChams()
     ChamsButton.Text = "Chams: " .. (ChamsEnabled and "ON" or "OFF")
