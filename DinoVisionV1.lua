@@ -11,7 +11,7 @@ local Headoff = Vector3.new(0, 0.5, 0)
 local Legoff = Vector3.new(0, 3, 0)
 
 local ESPEnabled = false -- Inicializa o ESP como desligado
-local GUIVisible = true -- Inicializa a interface como visível
+local ChamsEnabled = false
 
 local Options = {
     LineTracer = false,
@@ -90,14 +90,18 @@ local function createESP(player)
         local lineTracer = Drawing.new("Line")
         lineTracer.Visible = false
         lineTracer.Color = Color3.new(1, 1, 1)
-        -- VISUAL STUFF DEFINITION
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = character
+        highlight.Enabled = false
+        highlight.FillColor = Color3.new(1, 0, 0)
+        highlight.OutlineColor = Color3.new(1, 1, 1)
 
         ESP[player] = {
             PlayerEquipment = PlayerEquipment,
             BoxOutline = BoxOutline,
             Box = Box,
             PlayerInfo = PlayerInfo,
-            lineTracer = lineTracer
+            highlight = highlight,
         }
     end
 
@@ -170,6 +174,16 @@ local function updateESP()
                 elements.Box.Visible = false
                 elements.PlayerInfo.Visible = false
                 elements.lineTracer.Visible = false
+                end
+
+                elements.highlight.Enabled = ChamsEnabled
+            else
+                elements.PlayerEquipment.Visible = false
+                elements.BoxOutline.Visible = false
+                elements.Box.Visible = false
+                elements.PlayerInfo.Visible = false
+                elements.lineTracer.Visible = false
+                elements.highlight.Enabled = false
             end
         else
             removeESP(player)
@@ -195,7 +209,9 @@ local function toggleESP()
     ESPEnabled = not ESPEnabled
 end
 
--- Adiciona funções para alternar opções específicas do ESP
+local function toggleChams()
+    ChamsEnabled = not ChamsEnabled
+end
 local function toggleOption(option)
     if Options[option] ~= nil then
         Options[option] = not Options[option]
@@ -245,6 +261,10 @@ PlayerEquipmentButton.Size = UDim2.new(0, 200, 0, 50)
 PlayerEquipmentButton.Position = UDim2.new(0, 0, 0, 130)
 PlayerEquipmentButton.Text = "Toggle Player Equipment"
 PlayerEquipmentButton.Parent = MainFrame
+ChamsButton.Size = UDim2.new(0, 200, 0, 50)
+ChamsButton.Position = UDim2.new(0, 0, 0, 310)
+ChamsButton.Text = "Toggle Chams"
+ChamsButton.Parent = MainFrame
 
 ESPButton.MouseButton1Click:Connect(function()
     toggleESP()
@@ -259,4 +279,8 @@ end)
 PlayerEquipmentButton.MouseButton1Click:Connect(function()
     toggleOption("PlayerEquipment")
     PlayerEquipmentButton.Text = "Player Equipment: " .. (Options.PlayerEquipment and "ON" or "OFF")
+end)
+ChamsButton.MouseButton1Click:Connect(function()
+    toggleChams()
+    ChamsButton.Text = "Chams: " .. (ChamsEnabled and "ON" or "OFF")
 end)
