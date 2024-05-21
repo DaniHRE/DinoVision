@@ -27,6 +27,17 @@ local function studsToMeters(distanceInStuds)
     local metersPerStud = 0.28
     return distanceInStuds * metersPerStud
 end
+local function removeESP(player)
+    if ESP[player] then
+        if ESP[player].PlayerEquipment then ESP[player].PlayerEquipment:Remove() end
+        if ESP[player].BoxOutline then ESP[player].BoxOutline:Remove() end
+        if ESP[player].Box then ESP[player].Box:Remove() end
+        if ESP[player].PlayerInfo then ESP[player].PlayerInfo:Remove() end
+        if ESP[player].lineTracer then ESP[player].lineTracer:Remove() end
+        if ESP[player].highlight then ESP[player].highlight:Destroy() end
+        ESP[player] = nil
+    end
+end
 
 local function createESP(player)
     if player == Players.LocalPlayer then
@@ -39,7 +50,12 @@ local function createESP(player)
             return
         end
 
-        -- VISUAL STUFF DEFINITION
+        -- Monitorar a existência do HumanoidRootPart
+        humanoidRootPart.AncestryChanged:Connect(function(_, parent)
+            if not parent then
+                removeESP(player)
+            end
+        end)
         local PlayerEquipment = Drawing.new("Text")
         PlayerEquipment.Color = Color3.fromRGB(255, 255, 255)
         PlayerEquipment.Size = 12
@@ -156,12 +172,7 @@ local function updateESP()
                 elements.lineTracer.Visible = false
             end
         else
-            if elements.PlayerEquipment then elements.PlayerEquipment:Remove() end
-            if elements.BoxOutline then elements.BoxOutline:Remove() end
-            if elements.Box then elements.Box:Remove() end
-            if elements.PlayerInfo then elements.PlayerInfo:Remove() end
-            if elements.lineTracer then elements.lineTracer:Remove() end
-            ESP[player] = nil
+            removeESP(player)
         end
     end
 end
@@ -173,6 +184,7 @@ end
 
 -- Connect the PlayerAdded event to create ESP for new players
 Players.PlayerAdded:Connect(createESP)
+Players.PlayerRemoving:Connect(removeESP)
 
 RunService.RenderStepped:Connect(function()
     updateESP()
