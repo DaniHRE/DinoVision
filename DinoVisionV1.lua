@@ -42,7 +42,9 @@ local ESPHolder = Instance.new("Folder", CoreGui)
 ESPHolder.Name = "ESPHolder"
 
 local function IsAlive(Player)
-    return Player and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+    local character = Player and Player.Character
+    local worldCharacter = character and character:FindFirstChild("WorldCharacter")
+    return worldCharacter and worldCharacter:FindFirstChild("UpperTorso") ~= nil
 end
 
 local function GetTeam(Player)
