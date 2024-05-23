@@ -1,3 +1,36 @@
+local DinoVision = {
+	esp = {
+		CharacterSize = Vector2.new(5,6);
+		Box = {
+			TeamCheck = false;
+			Box = true;
+			Name = true;
+			Distance = true;
+			Color = Color3.fromRGB(255, 255, 255);
+			Outline = true;
+			OutlineColor = Color3.fromRGB(0,0,0);	
+		};
+
+		Tracer = {
+			TeamCheck = false;
+			TeamColor = false;
+			Tracer = true;
+			Color = Color3.fromRGB(255, 255, 255);
+			Outline = true;
+			OutlineColor = Color3.fromRGB(0, 0, 0);
+		};
+
+		Highlights = {
+			TeamCheck = false;
+			Highlights = true;
+			AllWaysVisible = true;
+			OutlineTransparency = 0.5;
+			FillTransparency = 0.5;
+			OutlineColor = Color3.fromRGB(255, 0, 0);
+			FillColor = Color3.fromRGB(255, 255, 255);
+		};
+	};
+}
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = game:GetService("Workspace").CurrentCamera
