@@ -166,7 +166,11 @@ local function LoadESP(Player)
     local co = coroutine.create(function()
         RunService.Heartbeat:Connect(function()
             if IsAlive(Player) then
-                local screen, onScreen = CurrentCamera:WorldToScreenPoint(Player.Character:FindFirstChild("HumanoidRootPart").Position)
+                local worldCharacter = Player.Character:FindFirstChild("WorldCharacter")
+                if worldCharacter then
+                    local upperTorso = worldCharacter:FindFirstChild("UpperTorso")
+                    if upperTorso then
+                        local screen, onScreen = CurrentCamera:WorldToScreenPoint(upperTorso.Position)
                 local frustumHeight = math.tan(math.rad(CurrentCamera.FieldOfView * 0.5)) * 2 * screen.Z
                 local size = CurrentCamera.ViewportSize.Y / frustumHeight * DinoVision.esp.CharacterSize
                 local position = Vector2.new(screen.X, screen.Y) - (size / 2 - Vector2.new(0, size.Y) / 20)
