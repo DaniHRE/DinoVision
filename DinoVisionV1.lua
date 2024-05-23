@@ -31,304 +31,325 @@ local DinoVision = {
 		};
 	};
 }
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Camera = game:GetService("Workspace").CurrentCamera
-
+local CoreGui = game:GetService("CoreGui")
 local CurrentCamera = workspace.CurrentCamera
-local worldToViewportPoint = CurrentCamera.worldToViewportPoint
+local localPlayer = Players.LocalPlayer
 
-local ESP = {}
+local ESPHolder = Instance.new("Folder", CoreGui)
+ESPHolder.Name = "ESPHolder"
 
-local Headoff = Vector3.new(0, 0.5, 0)
-local Legoff = Vector3.new(0, 3, 0)
-
-local ESPEnabled = false
-local ChamsEnabled = false
-
-local Options = {
-    Box = false,
-    NameDistance = false,
-    LineTracer = false,
-    PlayerEquipment = false,
-}
-
-local function calculateDistance(point1, point2)
-    return (point1 - point2).magnitude
+local function IsAlive(Player)
+    return Player and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
 end
 
-local function studsToMeters(distanceInStuds)
-    local metersPerStud = 0.28
-    return distanceInStuds * metersPerStud
+local function GetTeam(Player)
+    return Player and Player.Team
 end
 
-local function removeESP(player)
-    if ESP[player] then
-        if ESP[player].PlayerEquipment then ESP[player].PlayerEquipment:Remove() end
-        if ESP[player].BoxOutline then ESP[player].BoxOutline:Remove() end
-        if ESP[player].Box then ESP[player].Box:Remove() end
-        if ESP[player].PlayerInfo then ESP[player].PlayerInfo:Remove() end
-        if ESP[player].lineTracer then ESP[player].lineTracer:Remove() end
-        if ESP[player].highlight then ESP[player].highlight:Destroy() end
-        ESP[player] = nil
-    end
-end
+local function LoadESP(Player)
+    local PlayerESP = Instance.new("Folder", ESPHolder)
+    PlayerESP.Name = Player.Name .. "ESP"
 
-local function createESP(player)
-    if player == Players.LocalPlayer then
-        return
-    end
+    -- Box
+    local BoxHolder = Instance.new("ScreenGui", PlayerESP)
+    BoxHolder.Name = "Box"
+    BoxHolder.DisplayOrder = 2
 
-    local function characterAdded(character)
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart", 5)
-        if not humanoidRootPart then
-            return
-        end
+    local TracerHolder = Instance.new("ScreenGui", PlayerESP)
+    TracerHolder.Name = "Tracer"
 
-        -- Monitorar a existência do HumanoidRootPart
-        humanoidRootPart.AncestryChanged:Connect(function(_, parent)
-            if not parent then
-                removeESP(player)
-            end
-        end)
+    local HilightHolder = Instance.new("Folder", PlayerESP)
+    HilightHolder.Name = "Hilight"
 
-        local PlayerEquipment = Drawing.new("Text")
-        PlayerEquipment.Color = Color3.fromRGB(255, 255, 255)
-        PlayerEquipment.Size = 12
-        PlayerEquipment.Visible = false
-        PlayerEquipment.Center = true
-        PlayerEquipment.Outline = true
-        PlayerEquipment.Font = 2
+    local LeftOutline = Instance.new("Frame", BoxHolder)
+    LeftOutline.BackgroundColor3 = DinoVision.esp.Box.OutlineColor
+    LeftOutline.Visible = false
+    LeftOutline.BorderSizePixel = 1
 
-        local BoxOutline = Drawing.new("Square")
-        BoxOutline.Visible = false
-        BoxOutline.Color = Color3.new(0, 0, 0)
-        BoxOutline.Thickness = 3
-        BoxOutline.Transparency = 1
-        BoxOutline.Filled = false
+    local RightOutline = Instance.new("Frame", BoxHolder)
+    RightOutline.BackgroundColor3 = DinoVision.esp.Box.OutlineColor
+    RightOutline.Visible = false
+    RightOutline.BorderSizePixel = 1
 
-        local Box = Drawing.new("Square")
-        Box.Visible = false
-        Box.Color = Color3.new(1, 1, 1)
-        Box.Thickness = 1
-        Box.Transparency = 1
-        Box.Filled = false
+    local TopOutline = Instance.new("Frame", BoxHolder)
+    TopOutline.BackgroundColor3 = DinoVision.esp.Box.OutlineColor
+    TopOutline.Visible = false
+    TopOutline.BorderSizePixel = 1
 
-        local PlayerInfo = Drawing.new("Text")
-        PlayerInfo.Text = player.Name
-        PlayerInfo.Color = Color3.new(1, 1, 1)
-        PlayerInfo.Size = 12
-        PlayerInfo.Visible = false
-        PlayerInfo.Outline = true
-        PlayerInfo.Center = true
-        PlayerInfo.Font = 2
+    local BottomOutline = Instance.new("Frame", BoxHolder)
+    BottomOutline.BackgroundColor3 = DinoVision.esp.Box.OutlineColor
+    BottomOutline.Visible = false
+    BottomOutline.BorderSizePixel = 1
 
-        local lineTracer = Drawing.new("Line")
-        lineTracer.Visible = false
-        lineTracer.Color = Color3.new(1, 1, 1)
+    local Left = Instance.new("Frame", BoxHolder)
+    Left.BackgroundColor3 = DinoVision.esp.Box.Color
+    Left.Visible = false
+    Left.BorderSizePixel = 0
 
-        local highlight = Instance.new("Highlight")
-        highlight.Parent = character
-        highlight.Enabled = false
-        highlight.FillColor = Color3.new(1, 0, 0)
-        highlight.OutlineColor = Color3.new(1, 1, 1)
+    local Right = Instance.new("Frame", BoxHolder)
+    Right.BackgroundColor3 = DinoVision.esp.Box.Color
+    Right.Visible = false
+    Right.BorderSizePixel = 0
 
-        ESP[player] = {
-            PlayerEquipment = PlayerEquipment,
-            BoxOutline = BoxOutline,
-            Box = Box,
-            PlayerInfo = PlayerInfo,
-            lineTracer = lineTracer,
-            highlight = highlight,
-        }
-    end
+    local Top = Instance.new("Frame", BoxHolder)
+    Top.BackgroundColor3 = DinoVision.esp.Box.Color
+    Top.Visible = false
+    Top.BorderSizePixel = 0
 
-    if player.Character then
-        characterAdded(player.Character)
-    end
-    player.CharacterAdded:Connect(characterAdded)
-end
+    local Bottom = Instance.new("Frame", BoxHolder)
+    Bottom.BackgroundColor3 = DinoVision.esp.Box.Color
+    Bottom.Visible = false
+    Bottom.BorderSizePixel = 0
 
-local function updateESP()
-    for player, elements in pairs(ESP) do
-        local character = player.Character
-        if character and character:IsDescendantOf(workspace) and character:FindFirstChild("HumanoidRootPart") then
-            local RootPart = character:FindFirstChild("HumanoidRootPart")
-            local Head = character:FindFirstChild("Head") or RootPart
-            local screenPosition, isVisible = Camera:WorldToViewportPoint(RootPart.Position)
+    local Name = Instance.new("TextLabel", BoxHolder)
+    Name.BackgroundTransparency = 1
+    Name.Text = Player.Name
+    Name.Visible = false
+    Name.AnchorPoint = Vector2.new(0.5, 0.5)
+    Name.TextSize = 12
+    Name.Font = Enum.Font.SourceSansBold
+    Name.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Name.TextStrokeTransparency = 0
 
-            local RootPosition = worldToViewportPoint(CurrentCamera, RootPart.Position)
-            local HeadPosition = worldToViewportPoint(CurrentCamera, Head.Position + Headoff)
-            local LegPosition = worldToViewportPoint(CurrentCamera, RootPart.Position - Legoff)
+    local Distance = Instance.new("TextLabel", BoxHolder)
+    Distance.BackgroundTransparency = 1
+    Distance.Text = ""
+    Distance.Visible = false
+    Distance.AnchorPoint = Vector2.new(0.5, 0.5)
+    Distance.TextSize = 12
+    Distance.Font = Enum.Font.SourceSansBold
+    Distance.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Distance.TextStrokeTransparency = 0
 
-            local CameraPosition = Camera.CFrame.Position
-            local DistanceInMeters = studsToMeters(calculateDistance(RootPart.Position, CameraPosition))
+    local HealthBackground = Instance.new("Frame", BoxHolder)
+    HealthBackground.Visible = false
+    HealthBackground.BorderSizePixel = 1
+    HealthBackground.BorderColor3 = DinoVision.esp.Box.OutlineColor
 
-            if isVisible then
-                if ESPEnabled then
-                    elements.PlayerEquipment.Visible = Options.PlayerEquipment
-                    if Options.PlayerEquipment then
-                        local CurrentSlotSelected = player.CurrentSelected.Value
-                        local SlotName = string.format("Slot%i", CurrentSlotSelected)
-                        local Slot = player.GunInventory:FindFirstChild(SlotName).Value or "None"
+    -- local HealthBar = Instance.new("Frame", BoxHolder)
+    -- HealthBar.Visible = false
+    -- HealthBar.BorderSizePixel = 0
+    -- HealthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 
-                        Slot = tostring(Slot)
+    -- local Health = Instance.new("TextLabel", BoxHolder)
+    -- Health.BackgroundTransparency = 1
+    -- Health.Text = ""
+    -- Health.Visible = false
+    -- Health.AnchorPoint = Vector2.new(0.5, 0.5)
+    -- Health.TextSize = 12
+    -- Health.Font = Enum.Font.SourceSansBold
+    -- Health.TextColor3 = Color3.fromRGB(255, 255, 255)
+    -- Health.TextStrokeTransparency = 0
 
-                        elements.PlayerEquipment.Position = Vector2.new(elements.Box.Position.X + elements.Box.Size.X / 2, elements.Box.Position.Y + elements.Box.Size.Y - 15)
-                        elements.PlayerEquipment.Text = Slot
+    -- Tracer
+    local TracerOutline = Instance.new("Frame", TracerHolder)
+    TracerOutline.BackgroundColor3 = DinoVision.esp.Tracer.OutlineColor
+    TracerOutline.Visible = false
+    TracerOutline.BorderSizePixel = 1
+    TracerOutline.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    local Tracer = Instance.new("Frame", TracerHolder)
+    Tracer.BackgroundColor3 = DinoVision.esp.Tracer.Color
+    Tracer.Visible = false
+    Tracer.BorderSizePixel = 0
+    Tracer.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    -- Hilight
+    local Hilight = Instance.new("Highlight", HilightHolder)
+    Hilight.Enabled = false
+
+    local co = coroutine.create(function()
+        RunService.Heartbeat:Connect(function()
+            if IsAlive(Player) then
+                local screen, onScreen = CurrentCamera:WorldToScreenPoint(Player.Character:FindFirstChild("WorldCharacter").UpperTorso.Position)
+                local frustumHeight = math.tan(math.rad(CurrentCamera.FieldOfView * 0.5)) * 2 * screen.Z
+                local size = CurrentCamera.ViewportSize.Y / frustumHeight * DinoVision.esp.CharacterSize
+                local position = Vector2.new(screen.X, screen.Y) - (size / 2 - Vector2.new(0, size.Y) / 20)
+
+                if onScreen then
+                    -- Box
+                    if DinoVision.esp.Box.TeamCheck ~= true or GetTeam(Player) ~= GetTeam(localPlayer) then
+                        -- local health = Player.Character.Humanoid.Health
+                        -- local healthScale = health / Player.Character.Humanoid.MaxHealth
+                        -- local healthSizeY = size.Y * healthScale
+
+                        LeftOutline.Visible = DinoVision.esp.Box.Box and DinoVision.esp.Box.Outline
+                        RightOutline.Visible = DinoVision.esp.Box.Box and DinoVision.esp.Box.Outline
+                        TopOutline.Visible = DinoVision.esp.Box.Box and DinoVision.esp.Box.Outline
+                        BottomOutline.Visible = DinoVision.esp.Box.Box and DinoVision.esp.Box.Outline
+                        HealthBackground.Visible = DinoVision.esp.Box.HealthBar
+
+                        Left.Visible = DinoVision.esp.Box.Box
+                        Right.Visible = DinoVision.esp.Box.Box
+                        Top.Visible = DinoVision.esp.Box.Box
+                        Bottom.Visible = DinoVision.esp.Box.Box
+                        -- HealthBar.Visible = DinoVision.esp.Box.HealthBar
+                        Name.Visible = DinoVision.esp.Box.Name
+                        Distance.Visible = DinoVision.esp.Box.Distance and not DinoVision.esp.Box.Name
+                        -- Health.Visible = DinoVision.esp.Box.Health
+
+                        Left.Size = UDim2.fromOffset(size.X, 1)
+                        Right.Size = UDim2.fromOffset(size.X, 1)
+                        Top.Size = UDim2.fromOffset(1, size.Y)
+                        Bottom.Size = UDim2.fromOffset(1, size.Y)
+
+                        LeftOutline.Size = Left.Size
+                        RightOutline.Size = Right.Size
+                        TopOutline.Size = Top.Size
+                        BottomOutline.Size = Bottom.Size
+                        HealthBackground.Size = UDim2.fromOffset(4, size.Y)
+                        -- HealthBar.Size = UDim2.fromOffset(2, -healthSizeY)
+
+                        Left.Position = UDim2.fromOffset(position.X, position.Y)
+                        Right.Position = UDim2.fromOffset(position.X, position.Y + size.Y - 1)
+                        Top.Position = UDim2.fromOffset(position.X, position.Y)
+                        Bottom.Position = UDim2.fromOffset(position.X + size.X - 1, position.Y)
+                        Name.Position = UDim2.fromOffset(screen.X, screen.Y - (size.Y + Name.TextBounds.Y + 14) / 2)
+                        Distance.Position = UDim2.fromOffset(screen.X, screen.Y - (size.Y + Name.TextBounds.Y + 19) / 2)
+                        HealthBackground.Position = UDim2.fromOffset(position.X - 8, position.Y)
+                        -- HealthBar.Position = UDim2.fromOffset(position.X - 7, position.Y + size.Y)
+                        -- Health.Position = DinoVision.esp.Box.HealthBar and UDim2.fromOffset(position.X - 25, position.Y + size.Y - healthSizeY) or UDim2.fromOffset(position.X - 25, position.Y + size.Y)
+
+                        LeftOutline.Position = Left.Position
+                        RightOutline.Position = Right.Position
+                        TopOutline.Position = Top.Position
+                        BottomOutline.Position = Bottom.Position
+
+                        LeftOutline.BorderColor3 = DinoVision.esp.Box.OutlineColor
+                        RightOutline.BorderColor3 = DinoVision.esp.Box.OutlineColor
+                        TopOutline.BorderColor3 = DinoVision.esp.Box.OutlineColor
+                        BottomOutline.BorderColor3 = DinoVision.esp.Box.OutlineColor
+                        -- HealthBackground.BackgroundColor3 = DinoVision.esp.Box.OutlineColor
+                        -- HealthBackground.BorderColor3 = DinoVision.esp.Box.OutlineColor
+
+                        Left.BackgroundColor3 = DinoVision.esp.Box.Color
+                        Right.BackgroundColor3 = DinoVision.esp.Box.Color
+                        Top.BackgroundColor3 = DinoVision.esp.Box.Color
+                        Bottom.BackgroundColor3 = DinoVision.esp.Box.Color
+                        LeftOutline.BackgroundColor3 = DinoVision.esp.Box.Color
+                        RightOutline.BackgroundColor3 = DinoVision.esp.Box.Color
+                        TopOutline.BackgroundColor3 = DinoVision.esp.Box.Color
+                        BottomOutline.BackgroundColor3 = DinoVision.esp.Box.Color
+
+                        Distance.Text = math.floor(0.5 + (CurrentCamera.CFrame.Position - Player.Character.HumanoidRootPart.Position).magnitude)
+                        Name.Text = DinoVision.esp.Box.Name and DinoVision.esp.Box.Distance and Player.Name .. " (" .. math.floor(0.5 + (CurrentCamera.CFrame.Position - Player.Character.HumanoidRootPart.Position).magnitude) .. ")" or Player.Name
+                        -- Health.Text = math.floor(Player.Character.Humanoid.Health)
+                    else
+                        LeftOutline.Visible = false
+                        RightOutline.Visible = false
+                        TopOutline.Visible = false
+                        BottomOutline.Visible = false
+                        Left.Visible = false
+                        Right.Visible = false
+                        Top.Visible = false
+                        Bottom.Visible = false
+                        Name.Visible = false
+                        Distance.Visible = false
+                        -- HealthBackground.Visible = false
+                        -- HealthBar.Visible = false
+                        -- Health.Visible = false
                     end
 
-                    elements.BoxOutline.Visible = Options.Box
-                    elements.Box.Visible = Options.Box
+                    -- Tracer
+                    if DinoVision.esp.Tracer.TeamCheck ~= true or GetTeam(Player) ~= GetTeam(localPlayer) then
+                        local ScreenVec2 = Vector2.new(screen.X, screen.Y + size.Y / 2 + size.Y / 20)
+                        local Origin = Vector2.new(CurrentCamera.ViewportSize.X / 2, CurrentCamera.ViewportSize.Y - 1)
+                        local TracerPosition = (Origin + ScreenVec2) / 2
 
-                    elements.BoxOutline.Size = Vector2.new(1000 / RootPosition.Z * 2, HeadPosition.Y - LegPosition.Y)
-                    elements.BoxOutline.Position = Vector2.new(RootPosition.X - elements.BoxOutline.Size.X / 2, RootPosition.Y - elements.BoxOutline.Size.Y / 2)
+                        TracerOutline.Visible = DinoVision.esp.Tracer.Outline and DinoVision.esp.Tracer.Tracer
+                        Tracer.Visible = DinoVision.esp.Tracer.Tracer
 
-                    elements.Box.Size = Vector2.new(1000 / RootPosition.Z * 2, HeadPosition.Y - LegPosition.Y)
-                    elements.Box.Position = Vector2.new(RootPosition.X - elements.Box.Size.X / 2, RootPosition.Y - elements.Box.Size.Y / 2)
+                        Tracer.Rotation = math.deg(math.atan2(ScreenVec2.Y - Origin.Y, ScreenVec2.X - Origin.X))
+                        Tracer.Position = UDim2.new(0, TracerPosition.X, 0, TracerPosition.Y)
+                        Tracer.Size = UDim2.fromOffset((Origin - ScreenVec2).Magnitude, 1)
 
-                    elements.PlayerInfo.Visible = Options.NameDistance
-                    elements.PlayerInfo.Position = Vector2.new(LegPosition.X, LegPosition.Y)
-                    elements.PlayerInfo.Text = string.format("%s (%.1fm)", player.Name, DistanceInMeters)
+                        TracerOutline.Rotation = Tracer.Rotation
+                        TracerOutline.Position = Tracer.Position
+                        TracerOutline.Size = Tracer.Size
 
-                    elements.lineTracer.Visible = Options.LineTracer
-                    if Options.LineTracer then
-                        elements.lineTracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                        elements.lineTracer.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                        TracerOutline.BorderColor3 = DinoVision.esp.Tracer.OutlineColor
+                        Tracer.BackgroundColor3 = DinoVision.esp.Tracer.Color
+                    else
+                        TracerOutline.Visible = false
+                        Tracer.Visible = false
+                    end
+
+                    -- Hilight
+                    if DinoVision.esp.Highlights.TeamCheck ~= true or GetTeam(Player) ~= GetTeam(localPlayer) then
+                        Hilight.Enabled = DinoVision.esp.Highlights.Highlights
+                        Hilight.Adornee = Player.Character
+
+                        Hilight.OutlineColor = DinoVision.esp.Highlights.OutlineColor
+                        Hilight.FillColor = DinoVision.esp.Highlights.FillColor
+
+                        Hilight.FillTransparency = DinoVision.esp.Highlights.FillTransparency
+                        Hilight.OutlineTransparency = DinoVision.esp.Highlights.OutlineTransparency
+
+                        Hilight.DepthMode = DinoVision.esp.Highlights.AllWaysVisible and Enum.HighlightDepthMode.AlwaysOnTop or Enum.HighlightDepthMode.Occluded
+                    else
+                        Hilight.Enabled = false
+                        Hilight.Adornee = nil
                     end
                 else
-                    elements.PlayerEquipment.Visible = false
-                    elements.BoxOutline.Visible = false
-                    elements.Box.Visible = false
-                    elements.PlayerInfo.Visible = false
-                    elements.lineTracer.Visible = false
+                    LeftOutline.Visible = false
+                    RightOutline.Visible = false
+                    TopOutline.Visible = false
+                    BottomOutline.Visible = false
+                    Left.Visible = false
+                    Right.Visible = false
+                    Top.Visible = false
+                    Bottom.Visible = false
+                    TracerOutline.Visible = false
+                    Tracer.Visible = false
+                    Name.Visible = false
+                    Distance.Visible = false
+                    -- HealthBackground.Visible = false
+                    -- HealthBar.Visible = false
+                    -- Health.Visible = false
                 end
-
-                elements.highlight.Enabled = ChamsEnabled
             else
-                elements.PlayerEquipment.Visible = false
-                elements.BoxOutline.Visible = false
-                elements.Box.Visible = false
-                elements.PlayerInfo.Visible = false
-                elements.lineTracer.Visible = false
-                elements.highlight.Enabled = false
+                LeftOutline.Visible = false
+                RightOutline.Visible = false
+                TopOutline.Visible = false
+                BottomOutline.Visible = false
+                Left.Visible = false
+                Right.Visible = false
+                Top.Visible = false
+                Bottom.Visible = false
+                TracerOutline.Visible = false
+                Tracer.Visible = false
+                Name.Visible = false
+                Distance.Visible = false
+                HealthBackground.Visible = false
+                -- HealthBar.Visible = false
+                -- Health.Visible = false
+                -- Hilight.Adornee = nil
             end
-        else
-            removeESP(player)
+        end)
+        if not Players:FindFirstChild(Player.Name) then
+            PlayerESP:Destroy()
+            coroutine.yield()
         end
+    end)
+    coroutine.resume(co)
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= localPlayer then
+        LoadESP(player)
     end
 end
 
-for _, player in pairs(Players:GetPlayers()) do
-    createESP(player)
-end
-
-Players.PlayerAdded:Connect(createESP)
-Players.PlayerRemoving:Connect(removeESP)
-
-RunService.RenderStepped:Connect(function()
-    updateESP()
+Players.PlayerAdded:Connect(function(player)
+    LoadESP(player)
 end)
 
-local function toggleESP()
-    ESPEnabled = not ESPEnabled
-end
-
-local function toggleChams()
-    ChamsEnabled = not ChamsEnabled
-end
-
-local function toggleOption(option)
-    if Options[option] ~= nil then
-        Options[option] = not Options[option]
+Players.PlayerRemoving:Connect(function(player)
+    local esp = ESPHolder:FindFirstChild(player.Name .. "ESP")
+    if esp then
+        esp:Destroy()
     end
-end
-
-local UserInputService = game:GetService("UserInputService")
-
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local ESPButton = Instance.new("TextButton")
-local BoxButton = Instance.new("TextButton")
-local NameDistanceButton = Instance.new("TextButton")
-local LineTracerButton = Instance.new("TextButton")
-local PlayerEquipmentButton = Instance.new("TextButton")
-local ChamsButton = Instance.new("TextButton")
-
-local function ToggleInterface()
-    IsOpen = not IsOpen
-    MainFrame.Visible = IsOpen
-end
-
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.RightShift then
-        ToggleInterface()
-    end
-end)
-
-ScreenGui.Parent = game.CoreGui
-MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 200, 0, 370)
-MainFrame.Position = UDim2.new(0, 100, 0, 100)
-MainFrame.BackgroundTransparency = 0.5
-MainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-
-ESPButton.Size = UDim2.new(0, 200, 0, 50)
-ESPButton.Position = UDim2.new(0, 0, 0, 10)
-ESPButton.Text = "Toggle ESP"
-ESPButton.Parent = MainFrame
-
-BoxButton.Size = UDim2.new(0, 200, 0, 50)
-BoxButton.Position = UDim2.new(0, 0, 0, 70)
-BoxButton.Text = "Toggle Box"
-BoxButton.Parent = MainFrame
-
-NameDistanceButton.Size = UDim2.new(0, 200, 0, 50)
-NameDistanceButton.Position = UDim2.new(0, 0, 0, 130)
-NameDistanceButton.Text = "Toggle Name/Distance"
-NameDistanceButton.Parent = MainFrame
-
-LineTracerButton.Size = UDim2.new(0, 200, 0, 50)
-LineTracerButton.Position = UDim2.new(0, 0, 0, 190)
-LineTracerButton.Text = "Toggle Line Tracer"
-LineTracerButton.Parent = MainFrame
-
-PlayerEquipmentButton.Size = UDim2.new(0, 200, 0, 50)
-PlayerEquipmentButton.Position = UDim2.new(0, 0, 0, 250)
-PlayerEquipmentButton.Text = "Toggle Player Equipment"
-PlayerEquipmentButton.Parent = MainFrame
-
-ChamsButton.Size = UDim2.new(0, 200, 0, 50)
-ChamsButton.Position = UDim2.new(0, 0, 0, 310)
-ChamsButton.Text = "Toggle Chams"
-ChamsButton.Parent = MainFrame
-
-ESPButton.MouseButton1Click:Connect(function()
-    toggleESP()
-    ESPButton.Text = "ESP: " .. (ESPEnabled and "ON" or "OFF")
-end)
-
-BoxButton.MouseButton1Click:Connect(function()
-    toggleOption("Box")
-    BoxButton.Text = "Box: " .. (Options.Box and "ON" or "OFF")
-end)
-
-NameDistanceButton.MouseButton1Click:Connect(function()
-    toggleOption("NameDistance")
-    NameDistanceButton.Text = "Name/Distance: " .. (Options.NameDistance and "ON" or "OFF")
-end)
-
-LineTracerButton.MouseButton1Click:Connect(function()
-    toggleOption("LineTracer")
-    LineTracerButton.Text = "Line Tracer: " .. (Options.LineTracer and "ON" or "OFF")
-end)
-
-PlayerEquipmentButton.MouseButton1Click:Connect(function()
-    toggleOption("PlayerEquipment")
-    PlayerEquipmentButton.Text = "Player Equipment: " .. (Options.PlayerEquipment and "ON" or "OFF")
-end)
-
-ChamsButton.MouseButton1Click:Connect(function()
-    toggleChams()
-    ChamsButton.Text = "Chams: " .. (ChamsEnabled and "ON" or "OFF")
 end)
