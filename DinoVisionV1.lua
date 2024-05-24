@@ -3,27 +3,28 @@ local DinoVision = {
 		CharacterSize = Vector2.new(5,6);
 		Box = {
 			TeamCheck = false;
-			Box = true;
-			Name = true;
-			Distance = true;
+			Box = false;
+			Name = false;
+			Distance = false;
+            BoxTransparency = 1;
 			Color = Color3.fromRGB(255, 255, 255);
-			Outline = true;
+			Outline = false;
 			OutlineColor = Color3.fromRGB(0,0,0);	
 		};
 
 		Tracer = {
 			TeamCheck = false;
 			TeamColor = false;
-			Tracer = true;
+			Tracer = false;
 			Color = Color3.fromRGB(255, 255, 255);
-			Outline = true;
+			Outline = false;
 			OutlineColor = Color3.fromRGB(0, 0, 0);
 		};
 
 		Highlights = {
 			TeamCheck = false;
-			Highlights = true;
-			AllWaysVisible = true;
+			Highlights = false;
+			AllWaysVisible = false;
 			OutlineTransparency = 0.5;
 			FillTransparency = 0.5;
 			OutlineColor = Color3.fromRGB(255, 0, 0);
