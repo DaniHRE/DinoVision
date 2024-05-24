@@ -364,11 +364,12 @@ players.PlayerAdded:Connect(function(plr)
 	end
 end)
 
-local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
+local repo = 'https://raw.githubusercontent.com/DaniHRE/LinoriaLib/main/'
 
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
 Library:SetWatermarkVisibility(true)
 
 local FrameTimer = tick()
@@ -581,7 +582,6 @@ HighlightGB:AddToggle('HighlightAlwaysVisible', {
     end
 })
 
--- Inicializar ThemeManager e SaveManager
 ThemeManager:SetLibrary(Library);
 ThemeManager:SetFolder('DinoVision')
 ThemeManager:ApplyToTab(Tabs['UI Settings']);
