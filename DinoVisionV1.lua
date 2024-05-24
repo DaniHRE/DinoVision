@@ -412,6 +412,9 @@ local BoxGB = Tabs.Main:AddLeftGroupbox('Box')
 local EnemyGB = Tabs.Main:AddLeftGroupbox('Enemy')
 local TracerGB = Tabs.Main:AddRightGroupbox("Tracer");
 local HighlightGB = Tabs.Main:AddRightGroupbox("Highlight");
+local SettingsGB = Tabs['UI Settings']:AddRightGroupbox("Menu");
+
+SettingsGB:AddButton('Unload', function() Library:Unload() end)
 
 BoxGB:AddToggle('BoxEnabled', {
     Text = 'Enabled',
