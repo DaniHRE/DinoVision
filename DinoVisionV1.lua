@@ -370,7 +370,7 @@ local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local Window = Library:CreateWindow({
-    Title = tostring(cloneref(game:GetService("MarketplaceService")):GetProductInfo(game.PlaceId).Name) .. "| " .. "DinoVision V2";
+    Title = tostring(cloneref(game:GetService("MarketplaceService")):GetProductInfo(game.PlaceId).Name) .. "| " .. "DinoVision V1";
     Center = true,
     AutoShow = true,
 })
@@ -380,10 +380,13 @@ local Tabs = {
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
-local LeftGroupBox = Tabs.Main:AddLeftGroupbox('ESP Settings')
+local BoxGB = Tabs.Main:AddLeftGroupbox('Box')
+local EnemyGB = Tabs.Main:AddLeftGroupbox('Enemy')
+local TracerGB = Tabs.Main:AddRightGroupbox("Tracer");
+local HighlightGB = Tabs.Main:AddRightGroupbox("Highlight");
 
-LeftGroupBox:AddToggle('BoxEnabled', {
-    Text = 'Enable Box ESP',
+BoxGB:AddToggle('BoxEnabled', {
+    Text = 'Enabled',
     Default = DinoVision.esp.Box.Box,
     Tooltip = 'Enable or disable Box ESP',
     Callback = function(Value)
@@ -391,8 +394,31 @@ LeftGroupBox:AddToggle('BoxEnabled', {
     end
 })
 
-LeftGroupBox:AddToggle('BoxOutlineEnabled', {
-    Text = 'Enable Box Outline',
+BoxGB:AddSlider('BoxTransparency', {
+    Text = 'Transparency',
+    Default = DinoVision.esp.Box.BoxTransparency,
+    Min = 0,
+    Max = 1,
+    Rounding = 1,
+    Compact = false,
+    Callback = function(Value)
+        DinoVision.esp.Box.BoxTransparency = Value;
+    end
+})
+
+BoxGB:AddLabel('Color'):AddColorPicker('BoxColor', {
+    Default = DinoVision.esp.Box.Color,
+    Title = 'Color',
+    Transparency = 0,
+    Callback = function(Value)
+        DinoVision.esp.Box.Color = Value;
+    end
+})
+
+BoxGB:AddDivider()
+
+BoxGB:AddToggle('BoxOutlineEnabled', {
+    Text = 'Outline',
     Default = DinoVision.esp.Box.Outline,
     Tooltip = 'Enable or disable Box Outline',
     Callback = function(Value)
@@ -400,26 +426,17 @@ LeftGroupBox:AddToggle('BoxOutlineEnabled', {
     end
 })
 
-LeftGroupBox:AddLabel('BoxColor'):AddColorPicker('BoxColor', {
-    Default = DinoVision.esp.Box.Color,
-    Title = 'Box Color',
-    Transparency = 0,
-    Callback = function(Value)
-        DinoVision.esp.Box.Color = Value;
-    end
-})
-
-LeftGroupBox:AddLabel('BoxOutlineEnabled'):AddColorPicker('BoxOutlineColor', {
+BoxGB:AddLabel('Outline Color'):AddColorPicker('BoxOutlineColor', {
     Default = DinoVision.esp.Box.OutlineColor,
-    Title = 'Box Outline Color',
+    Title = 'Outline Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Box.OutlineColor = Value;
     end
 })
 
-LeftGroupBox:AddToggle('NameEnabled', {
-    Text = 'Enable Name',
+EnemyGB:AddToggle('NameEnabled', {
+    Text = 'Name',
     Default = DinoVision.esp.Box.Name,
     Tooltip = 'Enable or disable Name',
     Callback = function(Value)
@@ -427,8 +444,8 @@ LeftGroupBox:AddToggle('NameEnabled', {
     end
 })
 
-LeftGroupBox:AddToggle('DistanceEnabled', {
-    Text = 'Enable Distance',
+EnemyGB:AddToggle('DistanceEnabled', {
+    Text = 'Distance',
     Default = DinoVision.esp.Box.Distance,
     Tooltip = 'Enable or disable Distance',
     Callback = function(Value)
@@ -436,8 +453,8 @@ LeftGroupBox:AddToggle('DistanceEnabled', {
     end
 })
 
-LeftGroupBox:AddToggle('TracerEnabled', {
-    Text = 'Enable Tracer',
+TracerGB:AddToggle('TracerEnabled', {
+    Text = 'Enabled',
     Default = DinoVision.esp.Tracer.Tracer,
     Tooltip = 'Enable or disable Tracer',
     Callback = function(Value)
@@ -445,17 +462,17 @@ LeftGroupBox:AddToggle('TracerEnabled', {
     end
 })
 
-LeftGroupBox:AddLabel('Tracer Color'):AddColorPicker('TracerColor', {
+TracerGB:AddLabel('Color'):AddColorPicker('TracerColor', {
     Default = DinoVision.esp.Tracer.Color,
-    Title = 'Tracer Color',
+    Title = 'Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Tracer.Color = Value;
     end
 })
 
-LeftGroupBox:AddToggle('TracerEnabled', {
-    Text = 'Enable Tracer ESP',
+TracerGB:AddToggle('TracerOutline', {
+    Text = 'Outline',
     Default = DinoVision.esp.Tracer.Outline,
     Tooltip = 'Enable or disable Tracer Outline',
     Callback = function(Value)
@@ -464,17 +481,17 @@ LeftGroupBox:AddToggle('TracerEnabled', {
 })
 
 
-LeftGroupBox:AddLabel('Tracer Outline Color'):AddColorPicker('TracerOutlineColor', {
+TracerGB:AddLabel('Outline Color'):AddColorPicker('TracerOutlineColor', {
     Default = DinoVision.esp.Tracer.OutlineColor,
-    Title = 'Tracer Outline Color',
+    Title = 'Outline Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Tracer.OutlineColor = Value;
     end
 })
 
-LeftGroupBox:AddToggle('HighlightEnabled', {
-    Text = 'Enable Highlights',
+HighlightGB:AddToggle('HighlightEnabled', {
+    Text = 'Enabled',
     Default = DinoVision.esp.Highlights.Highlights,
     Tooltip = 'Enable or disable Highlights',
     Callback = function(Value)
@@ -482,17 +499,8 @@ LeftGroupBox:AddToggle('HighlightEnabled', {
     end
 })
 
-LeftGroupBox:AddLabel('Highlight Outline Color'):AddColorPicker('HighlightOutlineColor', {
-    Default = DinoVision.esp.Highlights.OutlineColor,
-    Title = 'Highlight Outline Color',
-    Transparency = 0,
-    Callback = function(Value)
-        DinoVision.esp.Highlights.OutlineColor = Value;
-    end
-})
-
-LeftGroupBox:AddSlider('Highlight Outline Transparency', {
-    Text = 'Highlight Outline Transparency',
+HighlightGB:AddSlider('HighlightOutlineTransparency', {
+    Text = 'Outline Transparency',
     Default = DinoVision.esp.Highlights.OutlineTransparency,
     Min = 0,
     Max = 1,
@@ -503,17 +511,17 @@ LeftGroupBox:AddSlider('Highlight Outline Transparency', {
     end
 })
 
-LeftGroupBox:AddLabel('Highlight Fill Color'):AddColorPicker('HighlightFillColor', {
-    Default = DinoVision.esp.Highlights.FillColor,
-    Title = 'Highlight Fill Color',
+HighlightGB:AddLabel('Outline Color'):AddColorPicker('HighlightOutlineColor', {
+    Default = DinoVision.esp.Highlights.OutlineColor,
+    Title = 'Outline Color',
     Transparency = 0,
     Callback = function(Value)
-        DinoVision.esp.Highlights.FillColor = Value;
+        DinoVision.esp.Highlights.OutlineColor = Value;
     end
 })
 
-LeftGroupBox:AddSlider('Highlight Fill Transparency', {
-    Text = 'Highlight Fill Transparency',
+HighlightGB:AddSlider('HighlightFillTransparency', {
+    Text = 'Fill Transparency',
     Default = DinoVision.esp.Highlights.FillTransparency,
     Min = 0,
     Max = 1,
@@ -524,8 +532,17 @@ LeftGroupBox:AddSlider('Highlight Fill Transparency', {
     end
 })
 
-LeftGroupBox:AddToggle('Enabled', {
-    Text = 'Always Visible Highlights',
+HighlightGB:AddLabel('Fill Color'):AddColorPicker('HighlightFillColor', {
+    Default = DinoVision.esp.Highlights.FillColor,
+    Title = 'Fill Color',
+    Transparency = 0,
+    Callback = function(Value)
+        DinoVision.esp.Highlights.FillColor = Value;
+    end
+})
+
+HighlightGB:AddToggle('HighlightAlwaysVisible', {
+    Text = 'Always Visible',
     Default = DinoVision.esp.Highlights.AlwaysVisible,
     Tooltip = 'Enable or disable Highlights',
     Callback = function(Value)
