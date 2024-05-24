@@ -316,6 +316,8 @@ local function LoadESP(Player)
                     -- HealthBar.Visible = false
                     -- Health.Visible = false
                 end
+                    end
+                end
             else
                 LeftOutline.Visible = false
                 RightOutline.Visible = false
