@@ -399,6 +399,8 @@ local Window = Library:CreateWindow({
     Title = tostring(cloneref(game:GetService("MarketplaceService")):GetProductInfo(game.PlaceId).Name) .. "| " .. "DinoVision V1";
     Center = true,
     AutoShow = true,
+    TabPadding = 8,
+    MenuFadeTime = 0.2
 })
 
 local Tabs = {
