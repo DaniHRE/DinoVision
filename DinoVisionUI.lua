@@ -52,6 +52,7 @@ local Tabs = {
 
 local BoxGB = Tabs.Main:AddLeftGroupbox('Box')
 local EnemyGB = Tabs.Main:AddLeftGroupbox('Enemy')
+local TracerGB = Tabs.Main:AddRightGroupbox("Tracer");
 BoxGB:AddToggle('BoxEnabled', {
     Text = 'Enabled',
     Default = DinoVision.esp.Box.Box,
@@ -120,8 +121,8 @@ EnemyGB:AddToggle('DistanceEnabled', {
     end
 })
 
-LeftGroupBox:AddToggle('TracerEnabled', {
-    Text = 'Enable Tracer',
+TracerGB:AddToggle('TracerEnabled', {
+    Text = 'Enabled',
     Default = DinoVision.esp.Tracer.Tracer,
     Tooltip = 'Enable or disable Tracer',
     Callback = function(Value)
@@ -129,17 +130,17 @@ LeftGroupBox:AddToggle('TracerEnabled', {
     end
 })
 
-LeftGroupBox:AddLabel('Tracer Color'):AddColorPicker('TracerColor', {
+TracerGB:AddLabel('Color'):AddColorPicker('TracerColor', {
     Default = DinoVision.esp.Tracer.Color,
-    Title = 'Tracer Color',
+    Title = 'Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Tracer.Color = Value;
     end
 })
 
-LeftGroupBox:AddToggle('TracerEnabled', {
-    Text = 'Enable Tracer ESP',
+TracerGB:AddToggle('TracerOutline', {
+    Text = 'Outline',
     Default = DinoVision.esp.Tracer.Outline,
     Tooltip = 'Enable or disable Tracer Outline',
     Callback = function(Value)
@@ -148,9 +149,9 @@ LeftGroupBox:AddToggle('TracerEnabled', {
 })
 
 
-LeftGroupBox:AddLabel('Tracer Outline Color'):AddColorPicker('TracerOutlineColor', {
+TracerGB:AddLabel('Outline Color'):AddColorPicker('TracerOutlineColor', {
     Default = DinoVision.esp.Tracer.OutlineColor,
-    Title = 'Tracer Outline Color',
+    Title = 'Outline Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Tracer.OutlineColor = Value;
