@@ -24,7 +24,7 @@ local DinoVision = {
 		Highlights = {
 			TeamCheck = false;
 			Highlights = false;
-			AlwaysVisible = false;
+			AllWaysVisible = false;
 			OutlineTransparency = 0.5;
 			FillTransparency = 0.5;
 			OutlineColor = Color3.fromRGB(255, 0, 0);
@@ -66,9 +66,11 @@ Library:OnUnload(function()
 end)
 
 local Window = Library:CreateWindow({
-    Title = tostring(cloneref(game:GetService("MarketplaceService")):GetProductInfo(game.PlaceId).Name) .. "| " .. "DinoVision V2";
+    Title = tostring(cloneref(game:GetService("MarketplaceService")):GetProductInfo(game.PlaceId).Name) .. "| " .. "DinoVision V1";
     Center = true,
     AutoShow = true,
+    TabPadding = 8,
+    MenuFadeTime = 0.2
 })
 
 local Tabs = {
@@ -249,7 +251,6 @@ HighlightGB:AddToggle('HighlightAllwaysVisible', {
     end
 })
 
--- Inicializar ThemeManager e SaveManager
 ThemeManager:SetLibrary(Library);
 ThemeManager:SetFolder('DinoVision')
 ThemeManager:ApplyToTab(Tabs['UI Settings']);
@@ -261,5 +262,3 @@ SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
 SaveManager:SetFolder('DinoVision');
 SaveManager:BuildConfigSection(Tabs['UI Settings']);
 SaveManager:LoadAutoloadConfig();
-
-Library:Notify("DinoVision Started 🆗")
