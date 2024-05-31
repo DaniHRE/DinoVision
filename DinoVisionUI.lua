@@ -6,8 +6,7 @@ local DinoVision = {
 			Box = false;
 			Name = false;
 			Distance = false;
-			-- Health = false;
-			-- HealthBar = false;
+            BoxTransparency = 1;
 			Color = Color3.fromRGB(255, 255, 255);
 			Outline = false;
 			OutlineColor = Color3.fromRGB(0,0,0);	
@@ -62,12 +61,15 @@ LeftGroupBox:AddToggle('BoxEnabled', {
     end
 })
 
-LeftGroupBox:AddToggle('BoxOutlineEnabled', {
-    Text = 'Enable Box Outline',
-    Default = DinoVision.esp.Box.Outline,
-    Tooltip = 'Enable or disable Box Outline',
+BoxGB:AddSlider('BoxTransparency', {
+    Text = 'Transparency',
+    Default = DinoVision.esp.Box.BoxTransparency,
+    Min = 0,
+    Max = 1,
+    Rounding = 1,
+    Compact = false,
     Callback = function(Value)
-        DinoVision.esp.Box.Outline = Value;
+        DinoVision.esp.Box.BoxTransparency = Value;
     end
 })
 
