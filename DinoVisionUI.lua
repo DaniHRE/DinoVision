@@ -235,12 +235,12 @@ LeftGroupBox:AddSlider('Highlight Fill Transparency', {
     end
 })
 
-LeftGroupBox:AddToggle('Enabled', {
-    Text = 'Always Visible Highlights',
-    Default = DinoVision.esp.Highlights.AlwaysVisible,
+HighlightGB:AddToggle('HighlightAllwaysVisible', {
+    Text = 'Always Visible',
+    Default = DinoVision.esp.Highlights.AllwaysVisible,
     Tooltip = 'Enable or disable Highlights',
     Callback = function(Value)
-        DinoVision.esp.Highlights.AlwaysVisible = Value;
+        DinoVision.esp.Highlights.AllwaysVisible = Value;
     end
 })
 
