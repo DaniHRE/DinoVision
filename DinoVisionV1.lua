@@ -585,7 +585,7 @@ HighlightGB:AddToggle('HighlightAlwaysVisible', {
 ThemeManager:SetLibrary(Library);
 ThemeManager:SetFolder('DinoVision')
 ThemeManager:ApplyToTab(Tabs['UI Settings']);
-ThemeManager:ApplyTheme("Ubuntu");
+ThemeManager:ApplyTheme("BBot");
 
 SaveManager:SetLibrary(Library);
 SaveManager:IgnoreThemeSettings();
