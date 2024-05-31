@@ -50,10 +50,10 @@ local Tabs = {
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
-local LeftGroupBox = Tabs.Main:AddLeftGroupbox('ESP Settings')
-
-LeftGroupBox:AddToggle('BoxEnabled', {
-    Text = 'Enable Box ESP',
+local BoxGB = Tabs.Main:AddLeftGroupbox('Box')
+local EnemyGB = Tabs.Main:AddLeftGroupbox('Enemy')
+BoxGB:AddToggle('BoxEnabled', {
+    Text = 'Enabled',
     Default = DinoVision.esp.Box.Box,
     Tooltip = 'Enable or disable Box ESP',
     Callback = function(Value)
@@ -73,26 +73,37 @@ BoxGB:AddSlider('BoxTransparency', {
     end
 })
 
-LeftGroupBox:AddLabel('BoxColor'):AddColorPicker('BoxColor', {
+BoxGB:AddLabel('Color'):AddColorPicker('BoxColor', {
     Default = DinoVision.esp.Box.Color,
-    Title = 'Box Color',
+    Title = 'Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Box.Color = Value;
     end
 })
 
-LeftGroupBox:AddLabel('BoxOutlineEnabled'):AddColorPicker('BoxOutlineColor', {
+BoxGB:AddDivider()
+
+BoxGB:AddToggle('BoxOutlineEnabled', {
+    Text = 'Outline',
+    Default = DinoVision.esp.Box.Outline,
+    Tooltip = 'Enable or disable Box Outline',
+    Callback = function(Value)
+        DinoVision.esp.Box.Outline = Value;
+    end
+})
+
+BoxGB:AddLabel('Outline Color'):AddColorPicker('BoxOutlineColor', {
     Default = DinoVision.esp.Box.OutlineColor,
-    Title = 'Box Outline Color',
+    Title = 'Outline Color',
     Transparency = 0,
     Callback = function(Value)
         DinoVision.esp.Box.OutlineColor = Value;
     end
 })
 
-LeftGroupBox:AddToggle('NameEnabled', {
-    Text = 'Enable Name',
+EnemyGB:AddToggle('NameEnabled', {
+    Text = 'Name',
     Default = DinoVision.esp.Box.Name,
     Tooltip = 'Enable or disable Name',
     Callback = function(Value)
@@ -100,8 +111,8 @@ LeftGroupBox:AddToggle('NameEnabled', {
     end
 })
 
-LeftGroupBox:AddToggle('DistanceEnabled', {
-    Text = 'Enable Distance',
+EnemyGB:AddToggle('DistanceEnabled', {
+    Text = 'Distance',
     Default = DinoVision.esp.Box.Distance,
     Tooltip = 'Enable or disable Distance',
     Callback = function(Value)
