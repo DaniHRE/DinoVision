@@ -79,6 +79,7 @@ local Tabs = {
 local BoxGB = Tabs.Main:AddLeftGroupbox('Box')
 local EnemyGB = Tabs.Main:AddLeftGroupbox('Enemy')
 local TracerGB = Tabs.Main:AddRightGroupbox("Tracer");
+local HighlightGB = Tabs.Main:AddRightGroupbox("Highlight");
 BoxGB:AddToggle('BoxEnabled', {
     Text = 'Enabled',
     Default = DinoVision.esp.Box.Box,
@@ -184,8 +185,8 @@ TracerGB:AddLabel('Outline Color'):AddColorPicker('TracerOutlineColor', {
     end
 })
 
-LeftGroupBox:AddToggle('HighlightEnabled', {
-    Text = 'Enable Highlights',
+HighlightGB:AddToggle('HighlightEnabled', {
+    Text = 'Enabled',
     Default = DinoVision.esp.Highlights.Highlights,
     Tooltip = 'Enable or disable Highlights',
     Callback = function(Value)
@@ -193,17 +194,8 @@ LeftGroupBox:AddToggle('HighlightEnabled', {
     end
 })
 
-LeftGroupBox:AddLabel('Highlight Outline Color'):AddColorPicker('HighlightOutlineColor', {
-    Default = DinoVision.esp.Highlights.OutlineColor,
-    Title = 'Highlight Outline Color',
-    Transparency = 0,
-    Callback = function(Value)
-        DinoVision.esp.Highlights.OutlineColor = Value;
-    end
-})
-
-LeftGroupBox:AddSlider('Highlight Outline Transparency', {
-    Text = 'Highlight Outline Transparency',
+HighlightGB:AddSlider('HighlightOutlineTransparency', {
+    Text = 'Outline Transparency',
     Default = DinoVision.esp.Highlights.OutlineTransparency,
     Min = 0,
     Max = 1,
@@ -214,17 +206,17 @@ LeftGroupBox:AddSlider('Highlight Outline Transparency', {
     end
 })
 
-LeftGroupBox:AddLabel('Highlight Fill Color'):AddColorPicker('HighlightFillColor', {
-    Default = DinoVision.esp.Highlights.FillColor,
-    Title = 'Highlight Fill Color',
+HighlightGB:AddLabel('Outline Color'):AddColorPicker('HighlightOutlineColor', {
+    Default = DinoVision.esp.Highlights.OutlineColor,
+    Title = 'Outline Color',
     Transparency = 0,
     Callback = function(Value)
-        DinoVision.esp.Highlights.FillColor = Value;
+        DinoVision.esp.Highlights.OutlineColor = Value;
     end
 })
 
-LeftGroupBox:AddSlider('Highlight Fill Transparency', {
-    Text = 'Highlight Fill Transparency',
+HighlightGB:AddSlider('HighlightFillTransparency', {
+    Text = 'Fill Transparency',
     Default = DinoVision.esp.Highlights.FillTransparency,
     Min = 0,
     Max = 1,
@@ -232,6 +224,15 @@ LeftGroupBox:AddSlider('Highlight Fill Transparency', {
     Compact = false,
     Callback = function(Value)
         DinoVision.esp.Highlights.FillTransparency = Value;
+    end
+})
+
+HighlightGB:AddLabel('Fill Color'):AddColorPicker('HighlightFillColor', {
+    Default = DinoVision.esp.Highlights.FillColor,
+    Title = 'Fill Color',
+    Transparency = 0,
+    Callback = function(Value)
+        DinoVision.esp.Highlights.FillColor = Value;
     end
 })
 
