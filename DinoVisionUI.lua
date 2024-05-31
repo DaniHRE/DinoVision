@@ -247,12 +247,14 @@ HighlightGB:AddToggle('HighlightAllwaysVisible', {
 
 -- Inicializar ThemeManager e SaveManager
 ThemeManager:SetLibrary(Library);
+ThemeManager:SetFolder('DinoVision')
 ThemeManager:ApplyToTab(Tabs['UI Settings']);
 ThemeManager:ApplyTheme("Ubuntu");
 
 SaveManager:SetLibrary(Library);
 SaveManager:IgnoreThemeSettings();
-SaveManager:SetFolder('Aftermath');
+SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
+SaveManager:SetFolder('DinoVision');
 SaveManager:BuildConfigSection(Tabs['UI Settings']);
 SaveManager:LoadAutoloadConfig();
 
