@@ -1,6 +1,7 @@
 DinoVision
 
 DinoVision is a gaming hack that offers an enhanced visual experience within the game environment.
+*ONLY AFTERMATH ROBLOX*
 
 Resources:
 - Viewing players through walls.
