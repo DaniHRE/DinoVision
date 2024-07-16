@@ -1,10 +1,10 @@
 DinoVision
 
-DinoVision é um hack para jogos que oferece uma experiência visual aprimorada dentro do ambiente do jogo.
+DinoVision is a gaming hack that offers an enhanced visual experience within the game environment.
 
-Recursos:
-- Visualização de jogadores através das paredes.
-- Exibição de informações úteis como nomes, distâncias e equipamentos.
-- Interface de usuário fácil de usar.
+Resources:
+- Viewing players through walls.
+- Display of useful information such as names, distances and equipment.
+- Easy to use user interface.
 
-Nota: Este projeto é apenas para fins educacionais e de aprendizado. O uso deste hack em ambientes de jogo online pode violar os termos de serviço do jogo e resultar em penalidades.
+Note: This project is for educational and learning purposes only. Using this hack in online gaming environments may violate the game's terms of service and result in penalties.
