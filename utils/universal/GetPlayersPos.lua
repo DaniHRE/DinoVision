@@ -2,18 +2,18 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
--- Função para calcular a distância entre dois pontos
+-- Function to calculate the distance between two points
 local function calculateDistance(point1, point2)
     return (point1 - point2).magnitude
 end
 
--- Função para converter distância em studs para metros
+-- Function to convert distance in studs to meters
 local function studsToMeters(distanceInStuds)
     local metersPerStud = 0.28
     return distanceInStuds * metersPerStud
 end
 
--- Função para obter a posição da câmera de um jogador
+-- Function to obtain a player's camera position
 local function getPlayerCameraPosition(player)
     local character = player.Character
     if character and character:IsDescendantOf(Workspace) and character:FindFirstChild("HumanoidRootPart") then
@@ -22,7 +22,7 @@ local function getPlayerCameraPosition(player)
     return nil
 end
 
--- Loop através dos jogadores
+-- Loop through players
 for _, player in pairs(Players:GetPlayers()) do
     local cameraPosition = getPlayerCameraPosition(player)
     if cameraPosition then
