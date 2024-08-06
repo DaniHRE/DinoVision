@@ -8,8 +8,9 @@ Resources:
 - Display of useful information such as names, distances and equipment.
 - Easy to use user interface.
 
-Note: This project is for educational and learning purposes only. Using this hack in online gaming environments may violate the game's terms of service and result in penalties.
-### Use that
+Use that
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/DaniHRE/DinoVision/main/DinoVisionV1.lua", true))()
 ```
+
+Note: This project is for educational and learning purposes only. Using this hack in online gaming environments may violate the game's terms of service and result in penalties.
